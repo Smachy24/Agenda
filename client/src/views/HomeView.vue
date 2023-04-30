@@ -3,13 +3,18 @@ import {reactive, ref, onMounted, computed} from 'vue';
 import {useFetch} from "@vueuse/core";
 import TaskBox from '../components/TaskBox.vue'
 
-const {isFetching, error, data:user} = useFetch('http://localhost:8080/getUsers')
+import {db} from '@/firebase'
+import {collection, getDocs} from 'firebase/firestore'
 
-const formattedUser = computed(()=>{
-    return JSON.parse(user.value)
+async function getUsers(){
+  const query = await getDocs(collection(db, "Users"))
+  console.log(query)
+  query.forEach((doc) =>{
+  console.log(doc.id, " => ", doc.data().name)
 })
+}
 
-
+getUsers();
 </script>
 
 <template>
@@ -17,7 +22,6 @@ const formattedUser = computed(()=>{
     <h1>
     Hello world!
   </h1>
-  {{ formattedUser }}
 
   <TaskBox></TaskBox>
   
