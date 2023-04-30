@@ -1,6 +1,7 @@
 <script setup>
 import {reactive, ref, onMounted, computed} from 'vue';
 import {useFetch} from "@vueuse/core";
+import TaskBox from '../components/TaskBox.vue'
 
 const {isFetching, error, data:user} = useFetch('http://localhost:8080/getUsers')
 
@@ -17,6 +18,8 @@ const formattedUser = computed(()=>{
     Hello world!
   </h1>
   {{ formattedUser }}
+
+  <TaskBox></TaskBox>
   
   </main>
 </template>
