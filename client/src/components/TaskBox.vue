@@ -2,7 +2,7 @@
 
     <div class="task-box" :style="{ backgroundColor: task.color }">
        <div class="task-title">{{ task.title }}</div>
-       <div class="task-time">8h00 à 9h00</div> 
+       <div class="task-time">{{ task.start_date + " : " +task.end_date }}</div> 
 
     </div>
 

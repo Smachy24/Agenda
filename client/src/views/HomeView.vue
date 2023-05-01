@@ -1,7 +1,9 @@
 <script setup>
 import {reactive, ref, onMounted, computed} from 'vue';
 import {useFetch} from "@vueuse/core";
+import * as dayjs from 'dayjs'
 import TaskBox from '../components/TaskBox.vue'
+
 
 import {db} from '@/firebase'
 import {collection, getDocs, query, onSnapshot, QuerySnapshot} from 'firebase/firestore'
@@ -22,7 +24,16 @@ async function getTask(){
   const unsubscribe = onSnapshot(q, (QuerySnapshot)=>{
     let tasks = []
     QuerySnapshot.forEach((doc)=>{
-      tasks.push(doc.data())
+      let task = {
+        id:doc.id,
+        user_id:doc.data()["user_id"],
+        start_date: dayjs(doc.data()["start_date"].toDate()).format("HH:mm"),
+        end_date:dayjs(doc.data()["end_date"].toDate()).format("HH:mm"),
+        title:doc.data()["title"],
+        color:doc.data()["color"]
+
+      }
+      tasks.push(task)
     })
     allTask.value=tasks
   })
