@@ -1,22 +1,23 @@
 <template>
 
-    <div class="task-box" :style="{ backgroundColor: color }">
-       <div class="task-title">Titre</div>
-       <div class="task-time">8h00 à 9h00</div>
+    <div class="task-box" :style="{ backgroundColor: task.color }">
+       <div class="task-title">{{ task.title }}</div>
+       <div class="task-time">8h00 à 9h00</div> 
+
     </div>
 
 </template>
 
-<script>
-    export default{
-        name:"TaskBox",
-        props:{
-            color:{
-                type:String,
-                default:"white"
-            }
+<script setup>
+
+
+    const props = defineProps({
+        task:{
+            type:Object,
+            default: () => ({ id: 0, title:"Tache par défaut" })
         }
-    }
+    })
+
 </script>
 
 <style>
