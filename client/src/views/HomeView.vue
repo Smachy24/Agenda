@@ -3,7 +3,7 @@ import {reactive, ref, onMounted, computed} from 'vue';
 import {useFetch} from "@vueuse/core";
 import * as dayjs from 'dayjs'
 import TaskBox from '../components/TaskBox.vue'
-
+import addTask from '../components/addTask.vue';
 
 import {db} from '@/firebase'
 import {collection, getDocs, query, onSnapshot, QuerySnapshot} from 'firebase/firestore'
@@ -63,7 +63,9 @@ onMounted(()=>{
     </div>
 
   </div>
-  
+
+  <addTask></addTask>
+
   
   </main>
 </template>
