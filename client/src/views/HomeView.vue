@@ -54,9 +54,6 @@ onMounted(()=>{
 
 <template>
   <main>
-    <h1>
-    Hello world!
-  </h1>
   <div id="list-task" >
     <div v-for="task in allTask">
       <TaskBox :task=task></TaskBox>
