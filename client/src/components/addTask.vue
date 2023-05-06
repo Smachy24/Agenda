@@ -95,6 +95,7 @@
     color:silver;
     padding: 0;
     margin: 8px;
+    cursor: pointer;
 }
 
 /* -------------------------------- */
