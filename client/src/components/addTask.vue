@@ -8,9 +8,10 @@
     <section class ="popup-add-task-container">
         <div class="popup-add-task">
             
-            <h2 class="popup-task-header-text">Ajouter une tâche</h2>
             
-
+            <h2 class="popup-task-header-text">Ajouter une tâche</h2>
+            <p class = "icon-close">&#x2715</p>
+           
             <div class="popup-task-title">
                 <input class="popup-task-title-input" type="text" required>
                 <span></span>
@@ -71,7 +72,7 @@
     position: absolute;
     flex-direction: column;
     background-color: white;
-    max-height: 45%;
+    max-height: 50%;
     min-width: 25%;
     max-width: 70%;
     row-gap: 10px;
@@ -85,12 +86,22 @@
     padding: 1vw 0;
     border-bottom: 1px solid silver;
 }
+.icon-close{
+    position:absolute;
+    top: 0;
+    right: 0;
+    font-size: 24px;
+    font-weight: 500;
+    color:silver;
+    padding: 0;
+    margin: 8px;
+}
 
 /* -------------------------------- */
 
 .popup-task-title, .popup-task-day {
     position: relative;
-    border-bottom: 2px solid #adadad;
+    border-bottom: 2px solid silver;
     margin: 1vw 0;
 }
 
@@ -108,7 +119,7 @@
     position: absolute;
     top: 50%;
     left: 5px;
-    color: #adadad;
+    color: silver;
     transform: translateY(-50%);
     font-size: 16px;
     pointer-events: none;
@@ -178,6 +189,7 @@ input[type=date]:focus::-webkit-datetime-edit {
     border: none;
     background: none;
     outline: none;
+    text-align: center;
 }
 
 /* -------------------------- */
@@ -212,6 +224,7 @@ input[type=date]:focus::-webkit-datetime-edit {
   .popup-add-task{
     width:60%;
   }
+  
 }
 
 @media (max-width: 400px) {
@@ -223,6 +236,12 @@ input[type=date]:focus::-webkit-datetime-edit {
   .popup-add-task{
     max-height: 70%;
     width: 80%;
+  }
+  .popup-task-start-hour input, .popup-task-end-hour input{
+    text-align: left;
+  }
+  .popup-task-header-text{
+    font-size: 1.3em;
   }
 }
 
