@@ -1,11 +1,16 @@
 <script setup>
 
+import buttonAddTask from './buttonAddTask.vue';
+
+const props = defineProps({
+    popupVisible:Boolean
+})
 
 </script>
 
 
 <template>
-    <section class ="popup-add-task-container">
+    <section class ="popup-add-task-container" :style="{display: popupVisible ? 'flex' : 'none'}">
         <div class="popup-add-task">
             
             
@@ -56,7 +61,7 @@
 }
 
 .popup-add-task-container{
-    display: flex;
+    /* display: flex; */
     position: absolute;
     top: 0;
     left: 0;
@@ -85,6 +90,7 @@
     text-align: center;
     padding: 1vw 0;
     border-bottom: 1px solid silver;
+    font-size: 1.7em;
 }
 .icon-close{
     position:absolute;

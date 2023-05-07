@@ -3,7 +3,8 @@ import {reactive, ref, onMounted, computed} from 'vue';
 import {useFetch} from "@vueuse/core";
 import * as dayjs from 'dayjs'
 import TaskBox from '../components/TaskBox.vue'
-import addTask from '../components/addTask.vue';
+import popupAddTask from '../components/popupAddTask.vue';
+import buttonAddTask from '../components/buttonAddTask.vue';
 
 import {db} from '@/firebase'
 import {collection, getDocs, query, onSnapshot, QuerySnapshot} from 'firebase/firestore'
@@ -43,6 +44,8 @@ async function getTask(){
 
 //onSnapshot
 
+const popupVisible = ref(false)
+
 onMounted(()=>{
   getTask();
 })
@@ -53,15 +56,15 @@ onMounted(()=>{
 </script>
 
 <template>
-  <main>
+  <main> 
   <div id="list-task" >
     <div v-for="task in allTask">
       <TaskBox :task=task></TaskBox>
     </div>
 
   </div>
-
-  <addTask></addTask>
+  <buttonAddTask @showPopup="popupVisible=true"></buttonAddTask>
+  <popupAddTask v-bind:popupVisible="popupVisible"></popupAddTask>
 
   
   </main>
