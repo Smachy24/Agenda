@@ -30,6 +30,8 @@ async function addTask(){
         title:title.value,
         user_id:"K86Hd51qjGnUg2zZgLlk"
     })
+    emit('showPopup')
+    
 }
 
 
