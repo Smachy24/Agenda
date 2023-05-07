@@ -1,16 +1,43 @@
 <script setup>
 
+import {db} from '@/firebase'
+import dayjs from 'dayjs';
+import {doc, setDoc} from 'firebase/firestore'
 
-import { ref, defineEmits } from "vue"
+import { computed, ref, defineEmits } from "vue"
 
 const emit = defineEmits(["showPopup"])
 
+const title = ref("");
+const color = ref("");
+const day = ref("")
+const start_date = ref("");
+const end_date = ref("");
+
+const buttonDisabled = ref(true)
+
+const isPopupValid = computed(()=>{
+    return title.value !== "" && color.value !== "" && day.value !== "" 
+    && start_date.value !== "" &&end_date.value !== ""
+})
+
+
+async function addTask(){
+    await setDoc(doc(db, "Task", "LA"),{
+        color:color.value,
+        end_date:new Date(day.value +" " + end_date.value),
+        start_date:new Date(day.value +" " + start_date.value),
+        title:title.value,
+        user_id:"K86Hd51qjGnUg2zZgLlk"
+    })
+}
 
 
 const props = defineProps({
     popupVisible:Boolean
 })
 
+// addTask()
 </script>
 
 
@@ -23,35 +50,39 @@ const props = defineProps({
             <p class = "icon-close" @click="emit('showPopup')">&#x2715</p>
            
             <div class="popup-task-title">
-                <input class="popup-task-title-input" type="text" required>
+                <input class="popup-task-title-input" type="text" required v-model="title">
                 <span></span>
                 <label>Titre</label>
             </div>
 
             <div class="popup-task-day">
                 
-                <input type="date" class="popup-task-day-input" max="9999-12-31" required>
+                <input type="date" class="popup-task-day-input" max="9999-12-31" required v-model="day">
                 <span></span>
                 <label>Date</label>
                
             </div>
 
             <div class="popup-task-time">
-                <div class="popup-task-start-hour">
+                <div class="popup-task-start-hour" >
                     <label>Début</label>
-                    <input type="time">
+                    <input type="time" v-model="start_date">
                     
                 </div>
 
                 <div class="popup-task-end-hour">
                     <label>Fin</label>
-                    <input type="time">
-
+                    <input type="time" v-model="end_date">
                 </div>
+            </div>
+
+            <div class="popup-task-color">
+                <label>Couleur</label>
+                <input type="color" v-model="color">
             </div>
             
 
-            <input class ="popup-task-button" type="submit" value="Ajouter">
+            <input class ="popup-task-button" type="submit" value="Ajouter" :disabled="!isPopupValid" @click="addTask()" >
 
         </div>
     </section>
@@ -206,6 +237,40 @@ input[type=date]:focus::-webkit-datetime-edit {
 
 /* -------------------------- */
 
+.popup-task-color{
+    display: flex;
+    align-items: center;
+    margin-top: 1vh;
+}
+
+.popup-task-color input{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    width: 30px;
+    height: 30px;
+    border: none;
+    cursor: pointer;
+}
+.popup-task-color input::-webkit-color-swatch {
+    border-radius: 50%;
+
+}
+.popup-task-color input::-moz-color-swatch {
+    border-radius: 50%;
+
+}
+
+.popup-task-color label{
+    color: #adadad;
+    height: 40px;
+    font-size: 16px;
+    padding: 7px;
+}
+
+/* -------------------------- */
+
 .popup-task-button{
     width: 100%;
     height: 50px;
@@ -217,7 +282,7 @@ input[type=date]:focus::-webkit-datetime-edit {
     font-weight: 700;
     cursor: pointer;
     outline: none;
-    margin:3vh 0;
+    margin:2vh 0;
 }
 
 .popup-task-button:hover{
