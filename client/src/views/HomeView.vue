@@ -4,7 +4,7 @@ import {useFetch} from "@vueuse/core";
 import * as dayjs from 'dayjs'
 import TaskBox from '../components/TaskBox.vue'
 import popupAddTask from '../components/popupAddTask.vue';
-import buttonAddTask from '../components/buttonAddTask.vue';
+
 
 import {db} from '@/firebase'
 import {collection, getDocs, query, onSnapshot, QuerySnapshot} from 'firebase/firestore'
@@ -63,9 +63,10 @@ onMounted(()=>{
     </div>
 
   </div>
-  <buttonAddTask @showPopup="popupVisible=true"></buttonAddTask>
-  <popupAddTask v-bind:popupVisible="popupVisible"></popupAddTask>
 
+  <popupAddTask v-bind:popupVisible="popupVisible" @showPopup="popupVisible=false"></popupAddTask>
+
+  <button @click="popupVisible=true">Add Task</button>
   
   </main>
 </template>

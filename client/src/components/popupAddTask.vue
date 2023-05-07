@@ -1,6 +1,11 @@
 <script setup>
 
-import buttonAddTask from './buttonAddTask.vue';
+
+import { ref, defineEmits } from "vue"
+
+const emit = defineEmits(["showPopup"])
+
+
 
 const props = defineProps({
     popupVisible:Boolean
@@ -15,7 +20,7 @@ const props = defineProps({
             
             
             <h2 class="popup-task-header-text">Ajouter une tâche</h2>
-            <p class = "icon-close">&#x2715</p>
+            <p class = "icon-close" @click="emit('showPopup')">&#x2715</p>
            
             <div class="popup-task-title">
                 <input class="popup-task-title-input" type="text" required>
