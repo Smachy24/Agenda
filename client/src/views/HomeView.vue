@@ -19,7 +19,7 @@ async function getUsers(){
 })
 }
 
-async function getTask(){
+function getTask(){
   
   const q = query(collection(db, "Task"))
   const unsubscribe = onSnapshot(q, (QuerySnapshot)=>{

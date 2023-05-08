@@ -2,7 +2,7 @@
 
 import {db} from '@/firebase'
 import dayjs from 'dayjs';
-import {doc, setDoc} from 'firebase/firestore'
+import {collection, doc, setDoc, where, query, getDocs, and, or} from 'firebase/firestore'
 
 import { computed, ref, defineEmits } from "vue"
 
@@ -21,8 +21,41 @@ const isPopupValid = computed(()=>{
     && start_date.value !== "" &&end_date.value !== ""
 })
 
+async function checkTaskByDay(){ 
+    let tomorrow = new Date(day.value)
+    tomorrow.setDate(tomorrow.getDate()+1)
+
+
+
+    const q =  query(collection(db, "Task"),
+    where("start_date", "<", new Date(tomorrow)),
+    where("start_date", ">=", new Date(day.value+"T00:00")) )
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) =>{
+        console.log(doc.id, " => ", doc.data())
+        console.log(checkTaskByHour());
+    })
+}
+
+async function checkTaskByHour(){
+    let isValid = true;
+    const q =  query(collection(db, "Task"),and(
+        or(
+        where("start_date", "<=", new Date(day.value +" " + start_date.value)),
+        where("end_date", ">", new Date(day.value +" " + start_date.value)) ),
+        or(
+        where("start_date", "<=", new Date(day.value +" " + end_date.value)),
+        where("end_date", ">", new Date(day.value +" " + end_date.value)))))
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) =>{
+        isValid=false
+    })
+    return isValid;
+}
 
 async function addTask(){
+    checkTaskByDay()
     await setDoc(doc(db, "Task", "LA"),{
         color:color.value,
         end_date:new Date(day.value +" " + end_date.value),
@@ -39,7 +72,7 @@ const props = defineProps({
     popupVisible:Boolean
 })
 
-// addTask()
+
 </script>
 
 
