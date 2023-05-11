@@ -2,7 +2,7 @@
 
 import {db} from '@/firebase'
 import dayjs from 'dayjs';
-import {collection, doc, setDoc, where, query, getDocs, and, or} from 'firebase/firestore'
+import {collection, doc, addDoc, setDoc, where, query, getDocs, and, or, orderBy, limit} from 'firebase/firestore'
 
 import { computed, ref, defineEmits } from "vue"
 
@@ -54,14 +54,29 @@ async function checkTaskByHour(){
     return isValid;
 }
 
+async function getLastTaskId(){
+    const q = query(collection(db, "Task"), orderBy("created_at", "desc"), limit(1))
+    const querySnapshot = await getDocs(q);
+    try {
+        return querySnapshot.docs[0].id
+    } catch (error) {
+        return 0;
+    }
+    
+}
+
 async function addTask(){
-    checkTaskByDay()
-    await setDoc(doc(db, "Task", "LA"),{
+    const lastTaskId = await getLastTaskId()
+    const id = parseInt(lastTaskId)+1
+    console.log(id);
+    // checkTaskByDay()
+    await setDoc(doc(db, "Task", id.toString()),{
         color:color.value,
         end_date:new Date(day.value +" " + end_date.value),
         start_date:new Date(day.value +" " + start_date.value),
         title:title.value,
-        user_id:"K86Hd51qjGnUg2zZgLlk"
+        user_id:"K86Hd51qjGnUg2zZgLlk",
+        created_at: new Date()
     })
     emit('showPopup')
     
