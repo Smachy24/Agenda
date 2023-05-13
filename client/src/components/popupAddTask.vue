@@ -25,33 +25,52 @@ async function checkTaskByDay(){
     let tomorrow = new Date(day.value)
     tomorrow.setDate(tomorrow.getDate()+1)
 
-
+    let isValidHour = true
 
     const q =  query(collection(db, "Task"),
     where("start_date", "<", new Date(tomorrow)),
     where("start_date", ">=", new Date(day.value+"T00:00")) )
     const querySnapshot = await getDocs(q);
+    if (start_date.value >= end_date.value){
+        console.log("0");
+        isValidHour = false
+    }
     querySnapshot.forEach((doc) =>{
-        console.log(doc.id, " => ", doc.data())
-        console.log(checkTaskByHour());
-    })
-}
+        console.log(doc.id, " => ", doc.data());
+        // if((start_date.value < doc.data()["start_date"] && end_date.value >= doc.data()["start_date"])||
+        // (start_date.value<doc.data()["end_date"] && end_date.value >doc.data()["end_date"]) ||
+        // (start_date.value> doc.data()["start_date"] && end_date.value < doc.data()["end_date"]) ||
+        // (end_date.value > doc.data()["start_date"] && start_date.value < doc.data()["end_date"]))
+        // {
+        //     isValidHour = false
+        // }
+        const inputStartMS = Date.parse(day.value +" " +start_date.value)
+        const inputEndMS = Date.parse(day.value +" " + end_date.value)
+        const startDateData = doc.data()["start_date"]["seconds"]
+        const endDateData = doc.data()["end_date"]["seconds"]
 
-async function checkTaskByHour(){
-    let isValid = true;
-    const q =  query(collection(db, "Task"),and(
-        or(
-        where("start_date", "<=", new Date(day.value +" " + start_date.value)),
-        where("end_date", ">", new Date(day.value +" " + start_date.value)) ),
-        or(
-        where("start_date", "<=", new Date(day.value +" " + end_date.value)),
-        where("end_date", ">", new Date(day.value +" " + end_date.value)))))
+        const inputStart = inputStartMS / 1000
+        const inputEnd = inputEndMS / 1000
 
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) =>{
-        isValid=false
+        if(inputStart < startDateData && inputEnd> startDateData){
+            isValidHour =false
+            console.log("1");
+        }
+        if(inputStart<endDateData && inputEnd >endDateData){
+            isValidHour=false
+            console.log("2");
+        }
+        if(inputStart> startDateData && inputEnd < endDateData){
+            isValidHour=false
+            console.log("3");
+        }
+        if(inputEnd > startDateData && inputStart < endDateData){
+            isValidHour =false
+            console.log("4");
+        }
+        
     })
-    return isValid;
+    return isValidHour
 }
 
 async function getLastTaskId(){
@@ -68,9 +87,11 @@ async function getLastTaskId(){
 async function addTask(){
     const lastTaskId = await getLastTaskId()
     const id = parseInt(lastTaskId)+1
-    console.log(id);
-    // checkTaskByDay()
-    await setDoc(doc(db, "Task", id.toString()),{
+
+    let validHour = await checkTaskByDay()
+    console.log(validHour);
+    if (validHour){
+        await setDoc(doc(db, "Task", id.toString()),{
         color:color.value,
         end_date:new Date(day.value +" " + end_date.value),
         start_date:new Date(day.value +" " + start_date.value),
@@ -79,6 +100,8 @@ async function addTask(){
         created_at: new Date()
     })
     emit('showPopup')
+    }
+   
     
 }
 
