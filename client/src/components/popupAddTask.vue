@@ -107,7 +107,7 @@ const props = defineProps({
 
 
 <template>
-    <section class ="popup-add-task-container" :style="{display: popupAddVisible ? 'flex' : 'none'}">
+    <section class ="popup-add-task-container" >
         <div class="popup-add-task">
             
             
@@ -162,7 +162,7 @@ const props = defineProps({
 }
 
 .popup-add-task-container{
-    /* display: flex; */
+    display: flex;
     position: absolute;
     top: 0;
     left: 0;

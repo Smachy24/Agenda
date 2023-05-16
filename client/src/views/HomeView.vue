@@ -55,9 +55,8 @@ function editTask(task) {
 
 let clicks = ref(0)
 let timer = ref(null)
-
-
-function testClick(event){
+ 
+function taskClick(task){
   clicks.value++;
   if(clicks.value ===1){
     timer.value = setTimeout(()=>{
@@ -67,7 +66,7 @@ function testClick(event){
   }
   else{
     clearTimeout(timer.value);
-    console.log("dbclick");
+    editTask(task)
     clicks.value = 0
   }
 }
@@ -84,17 +83,18 @@ onMounted(() => {
     <div id="list-task">
       <div v-for="task in allTask" :key="task.id">
         {{ task }}
-        <TaskBox :task="task" @click="testClick($event)"></TaskBox>
+        <TaskBox :task="task" @click="taskClick(task)"></TaskBox>
       </div>
     </div>
 
     <popupAddTask
       v-bind:popupAddVisible="popupAddVisible"
       @showPopup="popupAddVisible = false"
+      v-if="popupAddVisible"
     ></popupAddTask>
 
     <popupEditTask
-      :popupEditVisible="popupEditVisible"
+      v-if="popupEditVisible"
       :taskToEdit="taskToEdit"
       @showPopup="popupEditVisible = false"
     ></popupEditTask>

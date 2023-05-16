@@ -1,6 +1,8 @@
 <script setup>
 
-import { defineEmits,computed} from 'vue';
+import { defineEmits,computed, ref, onMounted} from 'vue';
+import {db} from '@/firebase'
+import {doc, getDoc, updateDoc} from 'firebase/firestore'
 
 const props = defineProps({
     popupEditVisible:Boolean,
@@ -9,21 +11,29 @@ const props = defineProps({
 
 const emit = defineEmits(["showPopup"])
 
-const title = computed(()=>{
-    return props.taskToEdit.title
+const id = computed(()=>{
+    return props.taskToEdit.id
 })
-const day = computed(()=>{
-    return props.taskToEdit.day
-})
-const startDate = computed(()=>{
-    return props.taskToEdit.start_date
-})
-const endDate = computed(()=>{
-    return props.taskToEdit.end_date
-})
-const color = computed(()=>{
-    return props.taskToEdit.color
-})
+
+
+
+const title = ref()
+const day = ref()
+const startDate = ref()
+const endDate = ref()
+const color = ref()
+
+
+async function editTask(){
+    const docRef = doc(db, "Task", id.value);
+
+    await updateDoc(docRef, {
+        title: title.value,
+        start_date:new Date(day.value +" " + startDate.value),
+        end_date: new Date(day.value +" " + endDate.value),
+        color: color.value
+    })
+}
 
 
 function popupClosed(){
@@ -31,18 +41,26 @@ function popupClosed(){
     emit('showPopup')
 }
 
+onMounted(()=>{
+    title.value = props.taskToEdit.title
+    day.value = props.taskToEdit.day
+    startDate.value = props.taskToEdit.start_date
+    endDate.value = props.taskToEdit.end_date
+    color.value = props.taskToEdit.color
+})
+
 </script>
 
 
 <template>
-    <section class ="popup-add-task-container" :style="{display: popupEditVisible ? 'flex' : 'none'}">
+    <section class ="popup-add-task-container">
         <div class="popup-add-task">
             
             <h2 class="popup-task-header-text">Modifier une tâche</h2>
             <p class = "icon-close" @click="popupClosed()">&#x2715</p>
            
             <div class="popup-task-title">
-                <input class="popup-task-title-input" type="text" required v-model="title">
+                <input class="popup-task-title-input" type="text" required  v-model="title">
                 <span></span>
                 <label>Titre</label>
             </div>
@@ -58,23 +76,24 @@ function popupClosed(){
             <div class="popup-task-time">
                 <div class="popup-task-start-hour" >
                     <label>Début</label>
-                    <input type="time" v-model="startDate">
+                    <input type="time"  v-model="startDate">
                     
                 </div>
 
                 <div class="popup-task-end-hour">
                     <label>Fin</label>
-                    <input type="time" v-model="endDate">
+                    <input type="time"  v-model="endDate">
                 </div>
             </div>
 
             <div class="popup-task-color">
                 <label>Couleur</label>
-                <input type="color" v-model="color">
+                <input type="color"  v-model="color">
             </div>
             
             <div class="popup-task-buttons">
-                <input class ="popup-task-edit-button" type="submit" value="Modifier" :disabled="!isPopupValid" @click="addTask()" >
+                <!-- :disabled="!isPopupValid" -->
+                <input class ="popup-task-edit-button" type="submit" value="Modifier"  @click="editTask" >
                 <input class ="popup-task-remove-button" type="submit" value="Supprimer">
             </div>
             
@@ -95,7 +114,7 @@ function popupClosed(){
 }
 
 .popup-add-task-container{
-    /* display: flex; */
+    display: flex;
     position: absolute;
     top: 0;
     left: 0;
