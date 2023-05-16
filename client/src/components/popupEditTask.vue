@@ -1,118 +1,45 @@
 <script setup>
 
-import {db} from '@/firebase'
-import dayjs from 'dayjs';
-import {collection, doc, addDoc, setDoc, where, query, getDocs, and, or, orderBy, limit} from 'firebase/firestore'
+import { defineEmits,computed} from 'vue';
 
-import { computed, ref, defineEmits } from "vue"
+const props = defineProps({
+    popupEditVisible:Boolean,
+    taskToEdit:Object
+})
 
 const emit = defineEmits(["showPopup"])
 
-const title = ref("");
-const color = ref("");
-const day = ref("")
-const start_date = ref("");
-const end_date = ref("");
-
-const buttonDisabled = ref(true)
-
-const isPopupValid = computed(()=>{
-    return title.value !== "" && color.value !== "" && day.value !== "" 
-    && start_date.value !== "" &&end_date.value !== ""
+const title = computed(()=>{
+    return props.taskToEdit.title
+})
+const day = computed(()=>{
+    return props.taskToEdit.day
+})
+const startDate = computed(()=>{
+    return props.taskToEdit.start_date
+})
+const endDate = computed(()=>{
+    return props.taskToEdit.end_date
+})
+const color = computed(()=>{
+    return props.taskToEdit.color
 })
 
-async function checkTaskByDay(){ 
-    let tomorrow = new Date(day.value)
-    tomorrow.setDate(tomorrow.getDate()+1)
 
-    let isValidHour = true
+function popupClosed(){
 
-    const q =  query(collection(db, "Task"),
-    where("start_date", "<", new Date(tomorrow)),
-    where("start_date", ">=", new Date(day.value+"T00:00")) )
-    const querySnapshot = await getDocs(q);
-    if (start_date.value >= end_date.value){
-        console.log("0");
-        isValidHour = false
-    }
-    querySnapshot.forEach((doc) =>{
-
-        const inputStartMS = Date.parse(day.value +" " +start_date.value)
-        const inputEndMS = Date.parse(day.value +" " + end_date.value)
-        const startDateData = doc.data()["start_date"]["seconds"]
-        const endDateData = doc.data()["end_date"]["seconds"]
-
-        const inputStart = inputStartMS / 1000
-        const inputEnd = inputEndMS / 1000
-
-        if(inputStart < startDateData && inputEnd> startDateData){
-            isValidHour =false
-            console.log("1");
-        }
-        if(inputStart<endDateData && inputEnd >endDateData){
-            isValidHour=false
-            console.log("2");
-        }
-        if(inputStart> startDateData && inputEnd < endDateData){
-            isValidHour=false
-            console.log("3");
-        }
-        if(inputEnd > startDateData && inputStart < endDateData){
-            isValidHour =false
-            console.log("4");
-        }
-        
-    })
-    return isValidHour
-}
-
-async function getLastTaskId(){
-    const q = query(collection(db, "Task"), orderBy("created_at", "desc"), limit(1))
-    const querySnapshot = await getDocs(q);
-    try {
-        return querySnapshot.docs[0].id
-    } catch (error) {
-        return 0;
-    }
-    
-}
-
-async function addTask(){
-    const lastTaskId = await getLastTaskId()
-    const id = parseInt(lastTaskId)+1
-
-    let validHour = await checkTaskByDay()
-    if (validHour){
-        await setDoc(doc(db, "Task", id.toString()),{
-        color:color.value,
-        end_date:new Date(day.value +" " + end_date.value),
-        start_date:new Date(day.value +" " + start_date.value),
-        title:title.value,
-        user_id:"K86Hd51qjGnUg2zZgLlk",
-        created_at: new Date()
-    })
     emit('showPopup')
-    }
-   
-    
 }
-
-
-const props = defineProps({
-    popupAddVisible:Boolean
-})
-
 
 </script>
 
 
 <template>
-    <section class ="popup-add-task-container" :style="{display: popupAddVisible ? 'flex' : 'none'}">
+    <section class ="popup-add-task-container" :style="{display: popupEditVisible ? 'flex' : 'none'}">
         <div class="popup-add-task">
             
-            
-            <h2 class="popup-task-header-text">Ajouter une tâche</h2>
-            <p class = "icon-close" @click="emit('showPopup')">&#x2715</p>
+            <h2 class="popup-task-header-text">Modifier une tâche</h2>
+            <p class = "icon-close" @click="popupClosed()">&#x2715</p>
            
             <div class="popup-task-title">
                 <input class="popup-task-title-input" type="text" required v-model="title">
@@ -131,13 +58,13 @@ const props = defineProps({
             <div class="popup-task-time">
                 <div class="popup-task-start-hour" >
                     <label>Début</label>
-                    <input type="time" v-model="start_date">
+                    <input type="time" v-model="startDate">
                     
                 </div>
 
                 <div class="popup-task-end-hour">
                     <label>Fin</label>
-                    <input type="time" v-model="end_date">
+                    <input type="time" v-model="endDate">
                 </div>
             </div>
 
@@ -146,12 +73,18 @@ const props = defineProps({
                 <input type="color" v-model="color">
             </div>
             
-
-            <input class ="popup-task-button" type="submit" value="Ajouter" :disabled="!isPopupValid" @click="addTask()" >
+            <div class="popup-task-buttons">
+                <input class ="popup-task-edit-button" type="submit" value="Modifier" :disabled="!isPopupValid" @click="addTask()" >
+                <input class ="popup-task-remove-button" type="submit" value="Supprimer">
+            </div>
+            
 
         </div>
     </section>
 </template>
+
+
+
 
 <style>
 
@@ -336,7 +269,13 @@ input[type=date]:focus::-webkit-datetime-edit {
 
 /* -------------------------- */
 
-.popup-task-button{
+.popup-task-buttons{
+    display: flex;
+    column-gap: 10px;
+}
+
+
+.popup-task-edit-button{
     width: 100%;
     height: 50px;
     border: 2px solid;
@@ -350,8 +289,27 @@ input[type=date]:focus::-webkit-datetime-edit {
     margin:2vh 0;
 }
 
-.popup-task-button:hover{
+.popup-task-edit-button:hover{
     border-color: #2691d9;
+    transition: .5s;
+}
+
+.popup-task-remove-button{
+    width: 100%;
+    height: 50px;
+    border: 2px solid;
+    background: red;
+    border-radius: 25px;
+    font-size: 18px;
+    color: #e9f4fb;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    margin:2vh 0;
+}
+
+.popup-task-remove-button:hover{
+    border-color: red;
     transition: .5s;
 }
 /* ----------------- */
