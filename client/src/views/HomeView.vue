@@ -82,7 +82,7 @@ onMounted(() => {
   <main>
     <div id="list-task">
       <div v-for="task in allTask" :key="task.id">
-        {{ task }}
+
         <TaskBox :task="task" @click="taskClick(task)"></TaskBox>
       </div>
     </div>

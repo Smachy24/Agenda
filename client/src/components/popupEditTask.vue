@@ -2,7 +2,7 @@
 
 import { defineEmits,computed, ref, onMounted} from 'vue';
 import {db} from '@/firebase'
-import {doc, getDoc, updateDoc} from 'firebase/firestore'
+import {doc, deleteDoc , updateDoc} from 'firebase/firestore'
 
 const props = defineProps({
     popupEditVisible:Boolean,
@@ -11,12 +11,8 @@ const props = defineProps({
 
 const emit = defineEmits(["showPopup"])
 
-const id = computed(()=>{
-    return props.taskToEdit.id
-})
 
-
-
+const id = ref()
 const title = ref()
 const day = ref()
 const startDate = ref()
@@ -35,9 +31,9 @@ async function editTask(){
     })
 }
 
-
-function popupClosed(){
-
+async function deleteTask(){
+    console.log(id.value);
+    await deleteDoc(doc(db, "Task", id.value))
     emit('showPopup')
 }
 
@@ -47,6 +43,7 @@ onMounted(()=>{
     startDate.value = props.taskToEdit.start_date
     endDate.value = props.taskToEdit.end_date
     color.value = props.taskToEdit.color
+    id.value = props.taskToEdit.id
 })
 
 </script>
@@ -57,7 +54,7 @@ onMounted(()=>{
         <div class="popup-add-task">
             
             <h2 class="popup-task-header-text">Modifier une tâche</h2>
-            <p class = "icon-close" @click="popupClosed()">&#x2715</p>
+            <p class = "icon-close" @click="emit('showPopup')">&#x2715</p>
            
             <div class="popup-task-title">
                 <input class="popup-task-title-input" type="text" required  v-model="title">
@@ -94,7 +91,7 @@ onMounted(()=>{
             <div class="popup-task-buttons">
                 <!-- :disabled="!isPopupValid" -->
                 <input class ="popup-task-edit-button" type="submit" value="Modifier"  @click="editTask" >
-                <input class ="popup-task-remove-button" type="submit" value="Supprimer">
+                <input class ="popup-task-remove-button" type="submit" value="Supprimer" @click="deleteTask">
             </div>
             
 
